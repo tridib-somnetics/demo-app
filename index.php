@@ -8,7 +8,8 @@
 <div>This is pure HTML message.</div>
 <div>Next, we’ll display today’s date and day by PHP!</div>
 
-<h1>PHP version</h1>
+<h3>PHP version</h3>
+<br>Here are ... <a href=version.php>details</a></br>
 <?php  echo 'Current PHP version on this box: ' . phpversion(); ?>
 <div>
 <?php
