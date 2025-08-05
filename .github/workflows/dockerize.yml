@@ -1,0 +1,60 @@
+name: Build and Push Docker Image to Docker Hub
+
+on:
+  push:
+    branches:
+      - dev
+      - uat
+      - main
+
+env:
+  IMAGE_NAME: your-dockerhub-username/php-crud-app
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set environment variables dynamically
+      run: |
+        if [[ $GITHUB_REF == "refs/heads/dev" ]]; then
+          echo "DB_SERVER=${{ secrets.DEV_DB_SERVER }}" >> $GITHUB_ENV
+          echo "DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DEV_DB_NAME }}" >> $GITHUB_ENV
+          TAG=dev
+        elif [[ $GITHUB_REF == "refs/heads/uat" ]]; then
+          echo "DB_SERVER=${{ secrets.UAT_DB_SERVER }}" >> $GITHUB_ENV
+          echo "DB_USERNAME=${{ secrets.UAT_DB_USERNAME }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.UAT_DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.UAT_DB_NAME }}" >> $GITHUB_ENV
+          TAG=uat
+        elif [[ $GITHUB_REF == "refs/heads/main" ]]; then
+          echo "DB_SERVER=${{ secrets.PROD_DB_SERVER }}" >> $GITHUB_ENV
+          echo "DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.PROD_DB_NAME }}" >> $GITHUB_ENV
+          TAG=prod
+        fi
+        echo "TAG=$TAG" >> $GITHUB_ENV
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build Docker image
+      run: |
+        docker build \
+          --build-arg DB_SERVER=$DB_SERVER \
+          --build-arg DB_USERNAME=$DB_USERNAME \
+          --build-arg DB_PASSWORD=$DB_PASSWORD \
+          --build-arg DB_NAME=$DB_NAME \
+          -t $IMAGE_NAME:$TAG .
+
+    - name: Push Docker image
+      run: docker push $IMAGE_NAME:$TAG
