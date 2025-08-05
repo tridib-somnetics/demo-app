@@ -4,5 +4,5 @@
 
 ### Project Demo
 
-Live Project URL- [PHP-CRUD](https://dev.tn-homelab.net/)
+Live Project URL- [PHP-CRUD](https://uat.tn-homelab.net/)
 
