@@ -8,7 +8,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: your-dockerhub-username/php-crud-app
+  IMAGE_NAME: tridib1981/demo-app
 
 jobs:
   build-and-push:
